@@ -25,7 +25,7 @@
             // Same words as "ok" on purpose, so the form never reveals whether an address is already on the list.
             dup: "You're on the list! We'll email you when the WriteRiff beta opens." },
     contact: { ok: "Thanks! Your message reached the WriteRiff team. We'll reply by email." },
-    unsubscribe: { ok: "Done. We've received your request and will remove this address from WriteRiff emails within a few days.",
+    unsubscribe: { ok: "Done. This address is now off all WriteRiff news emails, starting right away.",
                    soon: "We can't record that online just yet. Please email us at " },
     soon: "Thanks for your interest! Our sign-up desk opens in just a few days, so please try again soon, or email us at ",
     offline: "We couldn't send that just now. Please try again in a little while, or email us at "
@@ -74,14 +74,15 @@
   }
 
     function row(form, kind) {
-    if (kind === 'unsubscribe') return { email: val(form, 'email').toLowerCase() };
+    var hp = val(form, 'company').slice(0, 200) || null;   // honeypot: empty for people; the database drops rows that fill it
+    if (kind === 'unsubscribe') return { email: val(form, 'email').toLowerCase(), company: hp };
     var page = (location.pathname.split('/').filter(Boolean).pop() || 'home').slice(0, 40);
     if (kind === 'beta') {
       return { name: val(form, 'name') || null, email: val(form, 'email').toLowerCase(),
-               writes: val(form, 'writes').slice(0, 200) || null, source: page, marketing_opt_in: true };
+               writes: val(form, 'writes').slice(0, 200) || null, source: page, marketing_opt_in: true, company: hp };
     }
     return { name: val(form, 'name'), email: val(form, 'email'), topic: val(form, 'topic').slice(0, 40) || null,
-             message: val(form, 'message') };
+             message: val(form, 'message'), company: hp };
   }
 
   function send(kind, data) {
@@ -97,9 +98,9 @@
     }).then(function (r) {
       clearTimeout(timer);
       if (r.ok) return 'ok';
-      if (r.status === 409) return 'dup';                      // already signed up (unique email)
+      if (r.status === 409) return 'dup';                      // older table versions: already listed (now answered with 201)
       if (r.status === 404) return 'soon';                   // tables not created yet
-      return 'offline';                                      // rate limit, checks failed, or server trouble
+      return 'offline';                                      // 400 = hourly/daily limits or checks failed, or server trouble: "try again later"
     }, function () { clearTimeout(timer); return 'offline'; });
   }
 
@@ -118,8 +119,9 @@
         var first = form.querySelector('[aria-invalid="true"]'); if (first) first.focus();
         return;
       }
-      // Spam guards: a hidden field only bots fill in, and a minimum time on the page. Bots get a fake "thanks".
-      var bot = val(form, 'company') !== '' || Date.now() - LOADED < 2500;
+      // Spam guards: the hidden "company" field is sent with the row and the database silently drops rows that fill it;
+      // a submit within 2.5 s of loading the page is treated as a bot here and gets a fake "thanks" without sending.
+      var bot = Date.now() - LOADED < 2500;
       var btn = form.querySelector('[type="submit"]');
       form.classList.add('is-sending'); if (btn) btn.disabled = true;
       setStatus(form, 'Sending…');
