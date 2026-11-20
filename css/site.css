@@ -302,7 +302,8 @@ main { display: block; }
 
 /* ---------- quote ---------- */
 .quote { font: 400 italic clamp(1.6rem, 3vw, 2.4rem)/1.3 var(--serif); margin: 0; color: var(--on-night); max-width: 22em; }
-.quote::before { content: "\201C"; display: block; font-size: 3em; line-height: .6; color: #d9a45c; margin-bottom: 10px; }
+/* Decorative gold fountain-pen nib above the line (replaced the opening quote mark, 2026-11-20: it isn't a quotation). */
+.quote-nib { display: block; width: auto; height: 1.5em; margin: 0 0 18px 4px; fill: #d9a45c; overflow: visible; transform: rotate(28deg); transform-origin: 50% 50%; }
 .devices { position: relative; display: grid; grid-template-columns: 1fr; align-items: end; padding: 0 4% 0 0; }
 .devices .laptop { width: 86%; }
 .devices .tablet { position: absolute; right: 2%; bottom: 0; width: 28%; }
