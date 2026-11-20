@@ -95,7 +95,7 @@
     // the original, more leisurely pace. Either way the caret then blinks twice and fades away.
     var SP = h.getAttribute('data-typed') === 'brisk'
       ? { base: 22, jitter: 18, punct: 140, word: 20, lead: 180 }
-      : { base: 39, jitter: 51, punct: 300, word: 45, lead: 480 };   // 50% slower than the first version (Scott, 2026-11-20)
+      : { base: 32.5, jitter: 42.5, punct: 250, word: 37.5, lead: 400 };   // first version x1.5, then /1.2 (Scott, 2026-11-20)
     function step() {
       if (idx >= chars.length) {
         done = true; caret.classList.add('blink');
