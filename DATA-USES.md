@@ -2,7 +2,7 @@
 
 Every kind of data the website collects or sends. Update the row in the same change that adds, changes or removes a data flow (shared rule, 2026-11-18). Feeds the privacy policy (`site/_shared/privacy-content.html`, copied into each version's `privacy/` page).
 
-Status 2026-11-20: the site isn't live and the tables aren't created yet (`supabase/001_website_forms.sql`, planned).
+Status 2026-11-20: the site is live at writeriff.com (GitHub Pages, repo WriteRiff/writeriff-website). The form tables aren't created yet (`supabase/001_website_forms.sql`, planned), so the forms show a friendly fallback until then.
 
 | Data | Where it's collected | Where it's stored | Outside service that receives it | Why | How long it's kept | Linked to the person? |
 |---|---|---|---|---|---|---|
@@ -11,7 +11,7 @@ Status 2026-11-20: the site isn't live and the tables aren't created yet (`supab
 | Unsubscribe request: email address, date/time | `unsubscribe/` page (linked in every footer) | Supabase table `email_unsubscribes` (planned) | Supabase. The email service also handles the unsubscribe link in each email | To stop sending beta and news emails to that address | Kept so the address stays off the list (deleted on request) | Yes (email address) |
 | Contact message: name, email, topic, message, date/time | Contact form (`contact/`) | Supabase table `contact_messages` | Supabase | To read and answer questions and suggestions | As long as needed to answer, at most 2 years | Yes (email address) |
 | Intro "already seen" flag (`wr-intro-seen`) | Every page (opening animation) | The visitor's own browser (localStorage); never sent anywhere | None | So the opening animation plays only once per visitor | Until the visitor clears their browser data | No |
-| Standard web server logs (IP address, browser, page requested) | Every request | Hosting provider (GitHub Pages, once published) | GitHub | Security and keeping the site working (we don't use these) | GitHub's own retention | Not by us |
+| Standard web server logs (IP address, browser, page requested) | Every request | Hosting provider (GitHub Pages) | GitHub | Security and keeping the site working (we don't use these) | GitHub's own retention | Not by us |
 | Account pages (`account-callback/`, `delete-account/`) | Links in WriteRiff app emails | Nothing stored by the website; the callback page talks directly to Supabase Auth to confirm an email or set a new password | Supabase Auth | Part of the app's account system (covered by the app's own DATA-USES.md) | n/a | (app account) |
 
 Not used: cookies, analytics, advertising or tracking scripts, third-party fonts or embeds. If Cloudflare Web Analytics is added later (recommended in the plan), add a row and a privacy-policy paragraph.
