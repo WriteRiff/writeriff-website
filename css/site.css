@@ -662,3 +662,12 @@ a.key-primary, a.key-primary:hover, a.key-primary:focus-visible, button.key-prim
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
   .typed.per-letter .accent .ch { background-image: var(--accent-grad-soft); background-repeat: no-repeat; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
 }
+/* A6 (2026-11-20): no sideways drag on phones.
+   1. A laptop mockup that fills its column (Features > Folio) is narrowed so its wider base (margin 0 -7%) still fits:
+      laptop 100/114 of the column, base = the full column.
+   2. Guard: clip anything that still pokes out sideways. overflow-x: clip (not hidden) creates no scroll container,
+      so the sticky header keeps working; browsers without clip fall back to body { overflow-x: hidden } above. */
+.split > div > .laptop { width: 87.7%; margin-left: auto; margin-right: auto; }
+@supports (overflow-x: clip) {
+  html, body { overflow-x: clip; }
+}
