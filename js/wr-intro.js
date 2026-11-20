@@ -3,8 +3,8 @@
  * What it does
  *   - Header: draws the WriteRiff scribe mark (final frame of the app's real logo animation) into
  *     #brandMarkAnim, sized to fit #brandMark.
- *   - Intro (once per visitor): a full-screen overlay where the scribe logo draws itself (about 4 s), then
- *     glides and shrinks into the header mark (1 s) while the page fades in. A "Skip intro" button and Escape
+ *   - Intro (once per visitor): a full-screen overlay where the scribe logo draws itself (about 2.3 s), then
+ *     glides and shrinks into the header mark while the page fades in (about 3 s in all). A "Skip intro" button and Escape
  *     end it early. With prefers-reduced-motion the logo appears still, then the overlay fades (no movement).
  *
  * Page contract (each version provides):
@@ -25,7 +25,9 @@
   var REDUCED = root.classList.contains('reduced');
   var INTRO = root.classList.contains('intro-on');
 
-  var LOGO_HOLD = 4.0, GLIDE = 1.0, LOTTIE_FPS = 60, LAST_FRAME = 299, COMP_RATIO = 1160 / 1000;
+  // Website timing (2026-11-20, Scott): about 3 s in total. The logo draws 1.6x faster than in the app (its motion ends at
+  // 3.6 s of animation time = 2.25 s here), holds briefly, then glides into the header in 0.7 s. The app keeps its own speed.
+  var SPEED = 1.6, LOGO_HOLD = 2.3, GLIDE = 0.7, LOTTIE_FPS = 60, LAST_FRAME = 299, COMP_RATIO = 1160 / 1000;
   var TEXT_LAYERS = ['Imagine', 'Develop', 'Grow', 'dot 1', 'dot 2', 'tagline', 'wordmark'];
   var MARK_LAYERS = ['arc', 'W', 'R'];
 
@@ -130,7 +132,7 @@
 
   function render(t) {
     logoBox.style.opacity = String(smooth(t / 0.35));
-    var frame = Math.max(0, Math.min(LAST_FRAME, t * LOTTIE_FPS));
+    var frame = Math.max(0, Math.min(LAST_FRAME, t * LOTTIE_FPS * SPEED));
     if (introAnim && frame !== lastFrame) { introAnim.goToAndStop(frame, true); lastFrame = frame; }
     var p = clamp01((t - LOGO_HOLD) / GLIDE);
     if (p > 0) {
@@ -193,7 +195,7 @@
   layoutIntro();
   var introReady = loadAnim(logoBox).then(function (a) { introAnim = a; introText = layerEls(a, TEXT_LAYERS); a.goToAndStop(0, true); });
   // Safety net: never leave a visitor stuck behind the overlay.
-  setTimeout(function () { if (!finished) skip(); }, 9000);
+  setTimeout(function () { if (!finished) skip(); }, 7000);
   Promise.all([headerReady, introReady]).then(function () {
     if (finished) return;
     if (REDUCED) playStill(); else playLive();
