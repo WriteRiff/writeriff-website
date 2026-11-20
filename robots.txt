@@ -1,0 +1,5 @@
+User-agent: *
+Allow: /
+Disallow: /account-callback/
+
+Sitemap: https://writeriff.com/sitemap.xml

@@ -1,0 +1,297 @@
+<!doctype html>
+<!-- WriteRiff account page (T1, #33, 2026-11-19; review fixes the same day). Every account email button opens this page:
+     https://writeriff.com/account-callback#token_hash=...&type=signup|recovery|invite|email_change|magiclink
+     The one-time token_hash sits after "#", so it never reaches any web server, and opening the link uses up nothing (mail
+     scanners that follow links can't spend it). The writer presses a button; only then does the page ask Supabase to check the
+     link (POST /auth/v1/verify). Password reset and invitations then show a "choose a password" form on this page. Magic links
+     are never checked here: the button hands the unused token to the WriteRiff app, which checks it and signs in there.
+     The page wipes the link from the address bar first, never writes link text into the page, keeps any sign-in only in memory
+     and signs it out when done. wr-backend / wr-key below are left empty in git: the hosting copy is made by
+     `node scripts/prepare-account-callback-host.cjs` (fills in the dev project's public address and publishable key).
+     The script hash in the security policy and the logo are refreshed by `node scripts/build-account-emails.cjs`; checked by
+     `node scripts/check-account-emails.cjs` and `python scripts/shoot-account-emails.py`. -->
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src data:; style-src 'unsafe-inline'; script-src 'sha256-pEJ46QJmdz7OHu0mBwWEONT5yNl0DVxphxx2xK8ariA='; connect-src https://rnehrjdaruejuueztngc.supabase.co; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="robots" content="noindex">
+<meta name="color-scheme" content="light dark">
+<meta name="wr-backend" content="https://rnehrjdaruejuueztngc.supabase.co">
+<meta name="wr-key" content="sb_publishable_0HAwNWLF4Vy8m-84HymXsw_jIAR6V73">
+<title>WriteRiff account</title>
+<style>
+  :root { --bg:#f3f1ec; --card:#ffffff; --line:#e6e1d8; --ink:#1f1d1a; --body:#3d3934; --muted:#6b655c; --accent:#5B21D1; --link:#5B21D1; --field:#ffffff; --warn:#a3262a; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#141312; --card:#1f1d1b; --line:#36332e; --ink:#f3f0ea; --body:#d8d2c8; --muted:#a59e93; --link:#c3a6ff; --field:#171615; --warn:#ff9b93; } }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; }
+  body { background: var(--bg); color: var(--body); font: 17px/1.6 Arial, Helvetica, sans-serif; min-height: 100vh; }
+  main { max-width: 560px; margin: 0 auto; padding: 40px 16px 56px; }
+  .card { background: var(--card); border: 1px solid var(--line); border-radius: 16px; padding: 32px 28px; }
+  .brand { display: flex; align-items: center; gap: 12px; margin: 0 0 28px; color: var(--ink); font-weight: bold; font-size: 20px; }
+  .brand img { width: 44px; height: 44px; border-radius: 9px; display: block; }
+  h1 { color: var(--ink); font-size: 28px; line-height: 1.2; margin: 0 0 14px; }
+  h1:focus { outline: none; }
+  p { margin: 0 0 16px; }
+  .small { color: var(--muted); font-size: 15px; }
+  a { color: var(--link); }
+  .button { display: inline-block; margin: 8px 0 18px; padding: 14px 30px; border: 0; border-radius: 10px; background: var(--accent); color: #fff;
+            font: bold 17px/1.3 Arial, Helvetica, sans-serif; text-decoration: none; cursor: pointer; }
+  .button:focus-visible { outline: 3px solid var(--link); outline-offset: 3px; }
+  .button:disabled { opacity: .6; cursor: default; }
+  .check { width: 56px; height: 56px; border-radius: 50%; background: #efe8fd; color: var(--accent); display: flex; align-items: center;
+           justify-content: center; font-size: 30px; font-weight: bold; margin: 0 0 16px; }
+  @media (prefers-color-scheme: dark) { .check { background: #2c2440; color: #c3a6ff; } }
+  label { display: block; color: var(--ink); font-weight: bold; font-size: 15px; margin: 0 0 6px; }
+  input { display: block; width: 100%; margin: 0 0 16px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px;
+          background: var(--field); color: var(--ink); font: 17px/1.3 Arial, Helvetica, sans-serif; }
+  input:focus-visible { outline: 3px solid var(--link); outline-offset: 1px; }
+  input[readonly] { border-style: dashed; color: var(--muted); }
+  .warn { color: var(--warn); font-weight: bold; font-size: 15px; }
+  .foot { text-align: center; color: var(--muted); font-size: 13px; margin: 20px 0 0; }
+  [hidden] { display: none !important; }
+  @media (max-width: 420px) { .card { padding: 26px 20px; } h1 { font-size: 25px; } }
+  @media (prefers-reduced-motion: no-preference) { section { animation: wr-in .18s ease-out; } @keyframes wr-in { from { opacity: 0; } to { opacity: 1; } } }
+</style>
+</head>
+<body>
+<main>
+  <div class="card">
+    <div class="brand"><img id="wr-logo" alt="" src="data:image/png;base64,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eJ6nBw8erPFN13r7586do6NHj65AMF8QICoqip4/f14XAmhtxenTp/sF/FrJ849//IMePny4VkmegBGAjVLJyclerQUwYEVERNDc3NwaAUvr7aenp9OWLVv6XDOz9wkLC6Nnzpzx+eioBT/LV/QGv/aZPfHEE2puU5skT8AIwG7Sk08+6dXDYsBKSEighYWF1SYAuw673U6ff/55rxJdT67TbDariaGvCKAF/8SJE/0Cfvb+ERERdNWqVbVW8riG381Zb5vlsk020dHRCAsLq5E/fuTIETz++OPIzMxUF2b0OsVSkiTYbDafl2ATQvDggw9i7dq1up3B5rqw1blzZ6xZswa33nqrugGotrdQ4fzZ4Ajwvlmu9lQY7d5VT739jz76CD169EBmZqbqketZDizLss8IwMBPlY4JeoOf3V9JkjBx4kTs2rULt956K0RRBM/zdaMNjb+mGjZV/vLLL14lmUyqjB492iMHiEmea9euqXJBD8lTlQzat2+f124Vu392u53ec889usse9t6hoaHqekuwFbLVKgnk2iz3ypUrNeo74+mpMGxUFwQB2dnZePTRR3H48GG1LEAvyeMuvJ0B2K4tu92OMWPGYOvWrboePcskz80334w1a9aga9euquQJ6lXdYC+FABzNclknB2+m0Kr6AWn16cKFC9GnTx8cPnxYXa73VwsV9vlKSkq8Bn9ZWRlGjx6NrVu3wmQy6QJ+reQZN24csrKy0LVr17oleQKZA2ib5XpLAHftULS1MLm5uUhOTsbs2bPVjgf+qslxJUBpaalX4LdarRg1ahS++OILCIKgVpjq0aHBbDbj3Xffxbp169CgQYOgLmSrNZ3hfNksl43eMTExTu/B3pvneXz++eeYOnUqzp49q476gezLUxMJxD5PcXExRo0ahR07dugie5g5IIoi2rVrh1WrVqFHjx51VvIEXAJ5a4W6OxWG1e3bbDbMmjULI0aMwNmzZytsUA9UVLczBANfYWEhhg0bphv4tU2pxowZg927d6NHjx51WvIEdAbwtlmu9lSYmJgY1ds3mUw4dOgQHn30UezZs0d3b7+mBPDk8zIJd/XqVSQnJ6t2ra/Bz95TEAQsWLAAs2bNUv9+XZY8ASUAfNQs12KxICIiAoQQmEwmrFixAk899RQKCwt19cVrSnhPW6Mw8Ofn52P48OHIzs72+efR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"><span>WriteRiff</span></div>
+
+    <section data-state="none">
+      <h1>WriteRiff accounts</h1>
+      <p>This page opens when you use a button in a WriteRiff account email. Came from an email and this is all you see? Open the link in your phone's or computer's usual web browser.</p>
+      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+    </section>
+
+    <section data-state="confirm_signup" hidden>
+      <h1>Confirm your WriteRiff account</h1>
+      <p>One tap and your account is ready.</p>
+      <button class="button" type="button" data-go>Confirm my account</button>
+    </section>
+
+    <section data-state="confirm_email_change" hidden>
+      <h1>Confirm your new email address</h1>
+      <p>Press the button to confirm the change to your WriteRiff sign-in email.</p>
+      <button class="button" type="button" data-go>Confirm the change</button>
+      <p class="small">Didn't ask for this? Just close this page, and your email address stays the same.</p>
+    </section>
+
+    <section data-state="confirm_recovery" hidden>
+      <h1>Reset your password</h1>
+      <p>Press the button, then choose a new password for your WriteRiff account.</p>
+      <button class="button" type="button" data-go>Choose a new password</button>
+      <p class="small">Didn't ask for this? Just close this page, and your password stays the same.</p>
+    </section>
+
+    <section data-state="confirm_invite" hidden>
+      <h1>You're invited to WriteRiff</h1>
+      <p>Accept the invitation, then choose the password you'll use to sign in.</p>
+      <button class="button" type="button" data-go>Accept the invitation</button>
+    </section>
+
+    <section data-state="working" hidden>
+      <h1 aria-live="polite">Checking your link&hellip;</h1>
+      <p class="small">This takes a moment.</p>
+    </section>
+
+    <section data-state="password" hidden>
+      <h1>Choose a new password</h1>
+      <form id="pw-form" novalidate>
+        <label for="pw-account">Account</label>
+        <input id="pw-account" type="email" autocomplete="username" readonly>
+        <label for="pw-new">New password (at least 12 characters)</label>
+        <input id="pw-new" type="password" autocomplete="new-password" minlength="12" maxlength="72" required>
+        <label for="pw-again">Type it again</label>
+        <input id="pw-again" type="password" autocomplete="new-password" minlength="12" maxlength="72" required>
+        <div role="alert">
+          <p class="warn" data-msg="short" hidden>Use at least 12 characters.</p>
+          <p class="warn" data-msg="mismatch" hidden>The two passwords don't match.</p>
+          <p class="warn" data-msg="weak" hidden>That password is too easy to guess. Try a longer one, or a few unrelated words.</p>
+          <p class="warn" data-msg="same" hidden>That's your current password. Choose a new one.</p>
+          <p class="warn" data-msg="failed" hidden>We couldn't save it. Check your connection and try again.</p>
+        </div>
+        <button class="button" type="submit" id="pw-save">Save my password</button>
+      </form>
+    </section>
+
+    <section data-state="password_saved" hidden>
+      <div class="check" aria-hidden="true">&#10003;</div>
+      <h1>Password saved</h1>
+      <p>Go back to WriteRiff and sign in with your email address and your new password.</p>
+      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+      <p class="small">Button doesn't open the app? Just open WriteRiff from your home screen or apps list.</p>
+    </section>
+
+    <section data-state="signup" hidden>
+      <div class="check" aria-hidden="true">&#10003;</div>
+      <h1>You're confirmed!</h1>
+      <p>Your WriteRiff account is ready. Go back to WriteRiff and sign in with your email address and password.</p>
+      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+      <p class="small">Button doesn't open the app? Just open WriteRiff from your home screen or apps list.</p>
+    </section>
+
+    <section data-state="email_change" hidden>
+      <div class="check" aria-hidden="true">&#10003;</div>
+      <h1>Email address confirmed</h1>
+      <p>Your new email address is confirmed. Use it the next time you sign in to WriteRiff.</p>
+      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+    </section>
+
+    <section data-state="email_change_pending" hidden>
+      <h1>One down, one to go</h1>
+      <p>This address is confirmed. We also sent a link to your other email address: open that email and use its button too, to finish the change.</p>
+    </section>
+
+    <section data-state="magiclink" hidden>
+      <h1>Sign in to WriteRiff</h1>
+      <p>Press the button on the phone or tablet where WriteRiff is installed. The app checks the link and signs you in.</p>
+      <a class="button" id="open-app" href="writers-flow://workspace">Open WriteRiff to sign in</a>
+      <p class="small">On a computer? Sign in with your email address and password instead, or open this email on your phone.</p>
+    </section>
+
+    <section data-state="offline" hidden>
+      <h1>We couldn't reach WriteRiff</h1>
+      <p>Check your internet connection, then try again. Your link hasn't been used yet.</p>
+      <button class="button" type="button" data-retry>Try again</button>
+    </section>
+
+    <section data-state="unavailable" hidden>
+      <h1>Not quite ready</h1>
+      <p>This page isn't connected to WriteRiff yet, so your link wasn't used. Email <a href="mailto:accounts@writeriff.com">accounts@writeriff.com</a> and we'll sort it out.</p>
+    </section>
+
+    <section data-state="expired" hidden>
+      <h1>This link has expired</h1>
+      <p>Email links work once and expire after 1 hour. If you already used this one, you're all set.</p>
+      <p>Otherwise, open WriteRiff and ask for a new email from the sign-in screen or <strong>App Settings &rarr; Account</strong>.</p>
+      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+    </section>
+  </div>
+  <p class="foot">Questions? <a href="mailto:accounts@writeriff.com">accounts@writeriff.com</a> &middot; <a href="https://writeriff.com">writeriff.com</a></p>
+</main>
+<script>
+(function () {
+  "use strict";
+  var raw = (location.hash || "").slice(1) + "&" + (location.search || "").slice(1);
+  // Wipe the secret part of the link from the address bar and history before anything else.
+  if (location.hash || location.search) { try { history.replaceState(null, "", location.pathname); } catch (e) {} }
+  var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+  var p = Object.create(null);
+  raw.split("&").forEach(function (pair) {
+    if (!pair) return;
+    var i = pair.indexOf("=");
+    var key = i < 0 ? pair : pair.slice(0, i);
+    var value = i < 0 ? "" : pair.slice(i + 1);
+    try { key = decodeURIComponent(key.replace(/\+/g, " ")); value = decodeURIComponent(value.replace(/\+/g, " ")); } catch (e) { return; }
+    if (!(key in p)) p[key] = value;
+  });
+  // Link word -> Supabase verify type. Magic links are not verified here (the app does it).
+  var VERIFY = { signup: "email", email_change: "email_change", recovery: "recovery", invite: "invite" };
+  var TOKEN = /^[A-Za-z0-9_-]{20,512}$/;
+  var type = typeof p.type === "string" ? p.type : "";
+  var token = typeof p.token_hash === "string" ? p.token_hash : "";
+  var meta = function (name) { var m = document.querySelector('meta[name="' + name + '"]'); return (m && m.getAttribute("content")) || ""; };
+  var backend = meta("wr-backend");
+  var key = meta("wr-key");
+  var configured = /^https:\/\/[a-z0-9]{20}\.supabase\.co$/.test(backend) && /^[A-Za-z0-9._-]{20,1000}$/.test(key);
+  var session = null;
+
+  function show(name, focus) {
+    var sections = document.querySelectorAll("section[data-state]");
+    for (var n = 0; n < sections.length; n++) sections[n].hidden = sections[n].getAttribute("data-state") !== name;
+    document.documentElement.setAttribute("data-state", name);
+    if (focus) {
+      var target = document.querySelector('section[data-state="' + name + '"] ' + (focus === true ? "h1" : focus));
+      if (target) { if (focus === true) target.setAttribute("tabindex", "-1"); try { target.focus(); } catch (e) {} }
+    }
+  }
+  function message(name) {
+    var all = document.querySelectorAll("[data-msg]");
+    for (var n = 0; n < all.length; n++) all[n].hidden = all[n].getAttribute("data-msg") !== name;
+  }
+  function api(method, route, body, bearer) {
+    var headers = { "apikey": key, "Content-Type": "application/json" };
+    if (bearer) headers.Authorization = "Bearer " + bearer;
+    return fetch(backend + route, { method: method, headers: headers, body: body ? JSON.stringify(body) : undefined,
+      credentials: "omit", cache: "no-store", redirect: "error", referrerPolicy: "no-referrer" })
+      .then(function (r) {
+        return r.json().then(function (j) { return j; }, function () { return null; })
+          .then(function (j) { return { ok: r.ok, status: r.status, body: j && typeof j === "object" ? j : {} }; });
+      });
+  }
+  // Ends the sign-in this page received (it is only needed to save a password), so nothing stays signed in here.
+  function signOut() {
+    if (!session) return;
+    var access = session;
+    session = null;
+    api("POST", "/auth/v1/logout?scope=local", null, access).then(null, function () {});
+  }
+  function verify() {
+    if (!token) { show("expired", true); return; }
+    show("working", true);
+    api("POST", "/auth/v1/verify", { type: VERIFY[type], token_hash: token }).then(function (r) {
+      var b = r.body;
+      if (r.status >= 500 || r.status === 429) { show("offline", true); return; }
+      token = "";
+      if (r.ok && typeof b.access_token === "string" && /^[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+\.[A-Za-z0-9_-]+$/.test(b.access_token)) {
+        session = b.access_token;
+        if (type === "recovery" || type === "invite") {
+          var email = b.user && typeof b.user.email === "string" ? b.user.email : "";
+          document.getElementById("pw-account").value = email;
+          document.getElementById("pw-account").hidden = !email;
+          document.querySelector('label[for="pw-account"]').hidden = !email;
+          message("");
+          show("password", "#pw-new");
+          return;
+        }
+        signOut();
+        show(type, true);
+      } else if (r.ok && type === "email_change") {
+        show("email_change_pending", true);
+      } else {
+        show("expired", true);
+      }
+    }, function () { show("offline", true); });
+  }
+
+  var state = "none";
+  if (p.error || p.error_code || p.error_description) state = "expired";
+  else if (type === "magiclink") state = TOKEN.test(token) ? "magiclink" : "expired";
+  else if (has(VERIFY, type)) state = !TOKEN.test(token) ? "expired" : configured ? "confirm_" + type : "unavailable";
+  if (state === "magiclink") {
+    document.getElementById("open-app").setAttribute("href", "writers-flow://account-callback?type=magiclink&token_hash=" + encodeURIComponent(token));
+  }
+
+  var go = document.querySelectorAll("[data-go]");
+  for (var g = 0; g < go.length; g++) go[g].addEventListener("click", verify);
+  var retry = document.querySelector("[data-retry]");
+  if (retry) retry.addEventListener("click", function () { show("confirm_" + type, true); });
+  var form = document.getElementById("pw-form");
+  form.addEventListener("submit", function (event) {
+    event.preventDefault();
+    var first = document.getElementById("pw-new");
+    var again = document.getElementById("pw-again");
+    var save = document.getElementById("pw-save");
+    if (first.value.length < 12) { message("short"); first.focus(); return; }
+    if (first.value !== again.value) { message("mismatch"); again.focus(); return; }
+    if (!session) { show("expired", true); return; }
+    message("");
+    save.disabled = true;
+    api("PUT", "/auth/v1/user", { password: first.value }, session).then(function (r) {
+      save.disabled = false;
+      if (r.ok) { first.value = ""; again.value = ""; signOut(); show("password_saved", true); return; }
+      var code = r.body.error_code || r.body.code;
+      if (code === "weak_password") message("weak");
+      else if (code === "same_password") message("same");
+      else if (r.status === 401 || r.status === 403) { session = null; show("expired", true); }
+      else message("failed");
+    }, function () { save.disabled = false; message("failed"); });
+  });
+  show(state);
+})();
+</script>
+</body>
+</html>
