@@ -91,7 +91,11 @@
       caret.style.height = ch + 'px';
       caret.style.transform = 'translate3d(' + p.x.toFixed(1) + 'px,' + (p.t + (p.h - ch) / 2).toFixed(1) + 'px,0)';
     }
-    // Brisk: the whole line types in well under 2 s, then the caret blinks twice and fades away.
+    // Typing pace per heading: data-typed="brisk" (home hero: the whole line in well under 2 s); every other heading keeps
+    // the original, more leisurely pace. Either way the caret then blinks twice and fades away.
+    var SP = h.getAttribute('data-typed') === 'brisk'
+      ? { base: 22, jitter: 18, punct: 140, word: 20, lead: 180 }
+      : { base: 26, jitter: 34, punct: 200, word: 30, lead: 320 };
     function step() {
       if (idx >= chars.length) {
         done = true; caret.classList.add('blink');
@@ -100,14 +104,14 @@
       }
       chars[idx].classList.add('on'); idx++; place(idx);
       var ch = chars[idx - 1].textContent;
-      var delay = 22 + Math.random() * 18;                      // uneven, like a real typist
-      if (idx < chars.length && /[.,;:!?]/.test(ch)) delay += 140;
-      if (idx < chars.length && chars[idx].parentNode !== chars[idx - 1].parentNode) delay += 20; // between words
+      var delay = SP.base + Math.random() * SP.jitter;          // uneven, like a real typist
+      if (idx < chars.length && /[.,;:!?]/.test(ch)) delay += SP.punct;
+      if (idx < chars.length && chars[idx].parentNode !== chars[idx - 1].parentNode) delay += SP.word; // between words
       setTimeout(step, delay);
     }
     function begin() {
       measure(); place(0); caret.classList.add('show');
-      setTimeout(step, 180);
+      setTimeout(step, SP.lead);
     }
     var resizeT;
     window.addEventListener('resize', function () {
