@@ -11,6 +11,12 @@ Everything on the site that came from somewhere else. Add a row in the same chan
 | Account pages (`account-callback/`, `email/writeriff-mark.png`, `delete-account/`) | App email links, Google Play deletion page | From the app repo (`scripts/prepare-account-callback-host.cjs`, `web/delete-account/`) | Owned by Scott and Jana | (app repo) | Nothing; don't edit the callback page (script hash in its security policy) |
 | lottie-web 5.13.0 (`assets/lottie_light.min.js`) | Plays the logo animation | Airbnb | MIT | https://github.com/airbnb/lottie-web | Keep the MIT notice (`assets/lottie-web-LICENSE.md` sits next to the file) |
 
+## Outside services loaded by the live site
+
+| What | Where it's used | Source / author | License | Link | What we must do |
+|---|---|---|---|---|---|
+| Cloudflare Web Analytics beacon (`beacon.min.js`, loaded from Cloudflare, not copied into the site) | Every page except account-callback | Cloudflare | Cloudflare's terms of service (free service) | https://www.cloudflare.com/web-analytics/ | Nothing beyond the service terms; mention it in the privacy policy (done by the app repo) |
+
 ## Version A (antique meets modern)
 
 All photos: Unsplash, free Unsplash License (commercial use allowed, no credit required; none are Unsplash+). Resized, cropped, compressed to WebP.
