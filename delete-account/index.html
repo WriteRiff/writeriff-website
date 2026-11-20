@@ -1,35 +1,52 @@
 <!doctype html>
-<!-- WriteRiff account deletion page (#24, 2026-11-19). Static, no scripts, no tracking. Meant to be hosted at
-     https://writeriff.com/delete-account (owner step in docs/agent-history/2026-11-18-account-jobs/report.md) and given to
-     Google Play as the "delete account URL". Keep the list of what is deleted in step with DATA-USES.md. -->
 <html lang="en">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+<script>(function(){document.documentElement.classList.add('js');var q=new URLSearchParams(location.search),s=false;try{s=localStorage.getItem('wr-intro-seen')==='1'}catch(e){}var p=q.get('intro')!=='0'&&(q.get('intro')==='1'||!s);document.documentElement.classList.add(p?'intro-on':'intro-off');if(window.matchMedia&&matchMedia('(prefers-reduced-motion: reduce)').matches)document.documentElement.classList.add('reduced')})()</script>
 <title>Delete your WriteRiff account</title>
 <meta name="description" content="How to delete your WriteRiff account and the data saved to it.">
-<style>
-  :root { --bg: #faf8f4; --fg: #1f1d1a; --muted: #5d5850; --line: #e3ddd2; --accent: #7a3b2e; }
-  @media (prefers-color-scheme: dark) { :root { --bg: #16150f; --fg: #f1ede4; --muted: #b3ab9d; --line: #34312a; --accent: #e3a08f; } }
-  * { box-sizing: border-box; }
-  body { margin: 0; background: var(--bg); color: var(--fg); font: 17px/1.6 Georgia, "Times New Roman", serif; }
-  main { max-width: 680px; margin: 0 auto; padding: 40px 16px 64px; }
-  h1 { font-size: 30px; line-height: 1.2; margin: 0 0 8px; }
-  h2 { font-size: 20px; margin: 32px 0 8px; }
-  p, li { color: var(--fg); }
-  .lead, .small { color: var(--muted); }
-  .small { font-size: 14px; }
-  ol, ul { padding-left: 22px; }
-  li { margin: 6px 0; }
-  .box { border: 1px solid var(--line); border-radius: 10px; padding: 16px 18px; margin: 16px 0; }
-  a { color: var(--accent); }
-  strong { font-weight: 600; }
-</style>
+<link rel="canonical" href="https://writeriff.com/delete-account/">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="WriteRiff">
+<meta property="og:title" content="Delete your WriteRiff account">
+<meta property="og:description" content="How to delete your WriteRiff account and the data saved to it.">
+<meta property="og:url" content="https://writeriff.com/delete-account/">
+<meta property="og:image" content="https://writeriff.com/assets/og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="WriteRiff is coming: write, read and critique fiction, all in one place.">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Delete your WriteRiff account">
+<meta name="twitter:description" content="How to delete your WriteRiff account and the data saved to it.">
+<meta name="twitter:image" content="https://writeriff.com/assets/og-image.jpg">
+<link rel="icon" href="../favicon.ico" sizes="any">
+<link rel="icon" type="image/png" sizes="32x32" href="../assets/favicon-32.png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+<meta name="theme-color" content="#f6f0e4">
+<link rel="preload" href="../assets/fonts/fraunces-latin-600-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="../assets/fonts/inter-latin-400-normal.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="../css/site.css">
 </head>
 <body>
-<main>
+<a class="skip" href="#main">Skip to content</a>
+<header class="site-header">
+  <div class="wrap header-inner">
+    <a class="brand" href="../"><span class="brand-mark" id="brandMark" aria-hidden="true"><span class="brand-mark-anim" id="brandMarkAnim"></span></span><span class="brand-word" id="brandWord">Write<span class="r">R</span>iff</span><span class="sr-only"> home</span></a>
+    <button class="nav-toggle" type="button" aria-expanded="false" aria-controls="site-nav"><span class="nav-toggle-bars" aria-hidden="true"></span><span>Menu</span></button>
+    <nav class="site-nav" id="site-nav" aria-label="Main">
+      <a href="../features/">Features</a>
+      <a href="../contact/">Contact</a>
+      <a class="key key-primary key-sm" href="../beta/">Join the beta</a>
+    </nav>
+  </div>
+</header>
+<!-- delete-account: the text below is copied word for word from the app repo (delete-account/index.html), wrapped in the site layout by site/_tools/wrap_legal.py. Do not edit the wording here: change it in the app repo and re-run. -->
+<main id="main" class="legal-page legal-delete-account">
+<div class="legal-layout single">
+<div class="legal-main">
   <h1>Delete your WriteRiff account</h1>
-  <p class="lead">WriteRiff is made by Beckman Studios LLC. You can delete your account at any time, from inside the app or by email.</p>
+  <p class="legal-lead">WriteRiff is made by Beckman Studios LLC. You can delete your account at any time, from inside the app or by email.</p>
 
   <h2>Delete it in the app (fastest)</h2>
   <ol>
@@ -42,7 +59,7 @@
   <h2>Or ask us by email</h2>
   <p>Email <a href="mailto:support@writeriff.com?subject=Delete%20my%20WriteRiff%20account">support@writeriff.com</a> from the email address you sign in with, with the subject "Delete my WriteRiff account". We will confirm the request with you and delete the account within 30 days, then email you when it is done.</p>
 
-  <div class="box">
+  <div class="legal-box">
     <h2 style="margin-top:0">What is deleted</h2>
     <ul>
       <li>Your WriteRiff account and sign-in (email address, password, display name).</li>
@@ -52,11 +69,40 @@
     <h2>What is kept</h2>
     <ul>
       <li><strong>Stories saved only on your device stay on your device.</strong> We can't reach them; delete them in the app or uninstall it if you want them gone.</li>
-      <li>A record that a deletion happened (an anonymous account number and the date, with no email or writing), and spending records for paid voice features, which hold only an anonymous account number. We keep these to run the service safely and for accounting.</li>
+      <li>A record that a deletion happened (an anonymous account number and the date, with no email or writing), and spending records for AI book covers and narration, which hold only an anonymous account number, dates and amounts. Sign-in security logs held by our hosting provider age out on its own schedule. We keep these to run the service safely and for accounting.</li>
     </ul>
   </div>
 
-  <p class="small">Questions: <a href="mailto:support@writeriff.com">support@writeriff.com</a></p>
+  <p class="legal-small">Questions: <a href="mailto:support@writeriff.com">support@writeriff.com</a></p>
+</div>
+</div>
 </main>
+
+<footer class="site-footer">
+  <div class="wrap">
+    <div class="footer-top">
+      <div class="footer-brand">
+        <span class="word">Write<span class="r">R</span>iff</span>
+        <p>An app for writing, reading and critiquing fiction. Coming soon from the WriteRiff team.</p>
+      </div>
+      <nav class="footer-nav" aria-label="Footer">
+        <a href="../features/">Features</a>
+        <a href="../beta/">Join the beta</a>
+        <a href="../contact/">Contact</a>
+        <a href="../privacy/">Privacy</a>
+        <a href="../terms/">Terms</a>
+      </nav>
+    </div>
+    <div class="footer-bottom">
+      <span>&copy; 2026 Beckman Studios LLC</span>
+      <a href="../delete-account/">Delete an app account</a>
+    </div>
+  </div>
+</footer>
+<script src="../assets/lottie_light.min.js"></script>
+<script src="../assets/scribe-logo.js"></script>
+<script src="../js/wr-intro.js"></script>
+<script src="../js/wr-reveal.js"></script>
+<script src="../js/site.js"></script>
 </body>
 </html>
