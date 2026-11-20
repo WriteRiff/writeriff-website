@@ -649,3 +649,8 @@ a.key-primary, a.key-primary:hover, a.key-primary:focus-visible, button.key-prim
 .legal-page .legal-box { border: 1px solid var(--line); background: var(--card); border-radius: var(--radius); padding: 18px 22px; margin: 22px 0; box-shadow: var(--shadow-1); }
 @media (max-width: 600px) { .legal-page { padding: 0 16px; } .legal-layout { padding: 36px 0 64px; } .legal-page article h2 { font-size: 1.4rem; margin-top: 44px; } .legal-page .legal-summary { padding: 18px; } }
 @media print { .site-header, .site-footer, .legal-page aside.legal-toc { display: none; } .legal-layout { display: block; padding: 0; } }
+/* A6: unsubscribe page */
+.unsub-page .wrap { max-width: 760px; }
+.unsub-page .form-card { margin: 32px 0 26px; }
+.unsub-note { color: var(--ink-3); font-size: .95rem; margin: 0 0 12px; }
+@media (max-width: 600px) { .unsub-page .form-card { padding: 30px 20px 24px; } }

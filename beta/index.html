@@ -61,13 +61,12 @@
         <div class="field"><label for="b-name">Your name <span class="opt">(optional)</span></label><input id="b-name" name="name" type="text" autocomplete="name" maxlength="100"></div>
         <div class="field"><label for="b-email">Email</label><input id="b-email" name="email" type="email" autocomplete="email" required maxlength="254"></div>
         <div class="field"><label for="b-writes">What do you write? <span class="opt">(optional)</span></label><input id="b-writes" name="writes" type="text" maxlength="200" placeholder="Fantasy, thrillers, short stories…"></div>
-        <div class="check"><input id="b-updates" name="updates" type="checkbox" required checked><label for="b-updates">Yes, email me about the WriteRiff beta. I can unsubscribe at any time.</label></div>
-        <!-- TODO: final opt-in wording from app primary -->
-        <div class="check optin"><input id="b-news" name="marketing_opt_in" type="checkbox" checked><label for="b-news">Keep me up to date on WriteRiff news, promotions and new features.</label></div>
+        <!-- Wording from Scott, 2026-11-20 (matches the app's "special offers"). One box, unticked, required to join. -->
+        <div class="check"><input id="b-updates" name="updates" type="checkbox" required><label for="b-updates">Yes, email me about the WriteRiff beta, plus news, special offers and new features. Unsubscribe any time.</label></div>
         <div class="wr-hp" aria-hidden="true"><label>Company<input name="company" tabindex="-1" autocomplete="off"></label></div>
         <button class="key key-primary" type="submit">Join the beta</button>
         <p class="form-status" data-wr-status role="status" aria-live="polite"></p>
-        <p class="form-note">We use your email for the beta, and for news while the second box is ticked (untick it if you only want beta emails). Never for advertising. Read our <a href="../privacy/">privacy policy</a>.</p>
+        <p class="form-note">We use your email for beta emails and WriteRiff news, and never sell or share it. Unsubscribe any time. Read our <a href="../privacy/">privacy policy</a>.</p>
         <p class="form-note age">The beta is open to adults 18 and over in the United States.</p>
       </form>
     </div>
@@ -131,6 +130,7 @@
         <a href="../contact/">Contact</a>
         <a href="../privacy/">Privacy</a>
         <a href="../terms/">Terms</a>
+        <a href="../unsubscribe/">Unsubscribe</a>
       </nav>
     </div>
     <div class="footer-bottom">

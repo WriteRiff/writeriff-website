@@ -1,9 +1,10 @@
 /* WriteRiff website forms: beta sign-up and contact (shared by all site versions).
  *
  * Markup contract
- *   <form data-wr-form="beta" novalidate>            (or data-wr-form="contact")
+ *   <form data-wr-form="beta" novalidate>            (or data-wr-form="contact" / "unsubscribe")
  *     beta fields:    name (optional), email (required), writes (optional: what they write), updates (checkbox, required)
- *     optional on both forms: marketing_opt_in (unticked checkbox: news/promotions emails; sent only if present)
+ *     beta: the one required "updates" box covers beta emails AND news, so beta rows are sent with marketing_opt_in = true
+ *     unsubscribe fields: email (required): records a removal request in email_unsubscribes
  *     contact fields: name (required), email (required), topic (optional select), message (required)
  *     honeypot:       <div class="wr-hp" aria-hidden="true"><label>Company<input name="company" tabindex="-1" autocomplete="off"></label></div>
  *     status line:    <p data-wr-status role="status" aria-live="polite"></p>
@@ -11,7 +12,7 @@
  *   </form>
  *   The form gets class "is-sending", then "is-done" (success) or "is-error". Fields failing checks get aria-invalid="true".
  *
- * Saves to Supabase (tables beta_signups / contact_messages, insert-only for visitors; SQL in /supabase).
+ * Saves to Supabase (tables beta_signups / contact_messages / email_unsubscribes, insert-only for visitors; SQL in /supabase).
  * While those tables don't exist yet, or the network fails, visitors see a friendly message instead of an error.
  */
 (function () {
@@ -24,6 +25,8 @@
             // Same words as "ok" on purpose, so the form never reveals whether an address is already on the list.
             dup: "You're on the list! We'll email you when the WriteRiff beta opens." },
     contact: { ok: "Thanks! Your message reached the WriteRiff team. We'll reply by email." },
+    unsubscribe: { ok: "Done. We've received your request and will remove this address from WriteRiff emails within a few days.",
+                   soon: "We can't record that online just yet. Please email us at " },
     soon: "Thanks for your interest! Our sign-up desk opens in just a few days, so please try again soon, or email us at ",
     offline: "We couldn't send that just now. Please try again in a little while, or email us at "
   };
@@ -56,13 +59,13 @@
     var badEmail = !EMAIL_RE.test(email) || email.length > 254;
     invalid(form, 'email', badEmail); if (badEmail) errors.push('a valid email address');
     var name = val(form, 'name');
-    var badName = name.length > 100 || (kind === 'contact' && !name);
+    var badName = kind !== 'unsubscribe' && (name.length > 100 || (kind === 'contact' && !name));
     invalid(form, 'name', badName); if (badName) errors.push(kind === 'contact' ? 'your name' : 'a shorter name');
     if (kind === 'beta') {
       var up = form.elements.updates;
       var badUp = up && !up.checked;
-      invalid(form, 'updates', badUp); if (badUp) errors.push('a tick in the email-updates box');
-    } else {
+      invalid(form, 'updates', badUp); if (badUp) errors.push('a tick in the box (it\'s how you join the beta list)');
+    } else if (kind === 'contact') {
       var m = val(form, 'message');
       var badMsg = m.length < 2 || m.length > 5000;
       invalid(form, 'message', badMsg); if (badMsg) errors.push(m.length > 5000 ? 'a shorter message (5,000 characters at most)' : 'a message');
@@ -70,19 +73,19 @@
     return errors;
   }
 
-  function optIn(form) { var b = form.elements.marketing_opt_in; return b ? { marketing_opt_in: !!b.checked } : {}; }
-  function row(form, kind) {
+    function row(form, kind) {
+    if (kind === 'unsubscribe') return { email: val(form, 'email').toLowerCase() };
     var page = (location.pathname.split('/').filter(Boolean).pop() || 'home').slice(0, 40);
     if (kind === 'beta') {
       return { name: val(form, 'name') || null, email: val(form, 'email').toLowerCase(),
-               writes: val(form, 'writes').slice(0, 200) || null, source: page, ...optIn(form) };
+               writes: val(form, 'writes').slice(0, 200) || null, source: page, marketing_opt_in: true };
     }
     return { name: val(form, 'name'), email: val(form, 'email'), topic: val(form, 'topic').slice(0, 40) || null,
-             message: val(form, 'message'), ...optIn(form) };
+             message: val(form, 'message') };
   }
 
   function send(kind, data) {
-    var table = kind === 'beta' ? 'beta_signups' : 'contact_messages';
+    var table = kind === 'beta' ? 'beta_signups' : kind === 'unsubscribe' ? 'email_unsubscribes' : 'contact_messages';
     if (!cfg.supabaseUrl || !cfg.supabaseKey || !window.fetch) return Promise.resolve('soon');
     var ctrl = window.AbortController ? new AbortController() : null;
     var timer = setTimeout(function () { if (ctrl) ctrl.abort(); }, 12000);
@@ -101,7 +104,7 @@
   }
 
   function wire(form) {
-    var kind = form.getAttribute('data-wr-form') === 'contact' ? 'contact' : 'beta';
+    var attr = form.getAttribute('data-wr-form'); var kind = attr === 'contact' || attr === 'unsubscribe' ? attr : 'beta';
     form.setAttribute('novalidate', '');
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -125,11 +128,11 @@
         form.classList.remove('is-sending'); if (btn) btn.disabled = false;
         if (result === 'ok' || result === 'dup') {
           form.classList.add('is-done');
-          setStatus(form, result === 'dup' ? MSG.beta.dup : MSG[kind].ok);
+          setStatus(form, result === 'dup' && kind === 'beta' ? MSG.beta.dup : MSG[kind].ok);
           form.reset();
         } else {
           form.classList.add('is-error');
-          setStatus(form, result === 'offline' ? MSG.offline : MSG.soon, true);
+          setStatus(form, result === 'offline' ? MSG.offline : (MSG[kind].soon || MSG.soon), true);
         }
       });
     });
