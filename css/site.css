@@ -199,7 +199,8 @@ main { display: block; }
 .js .typed-vis.is-armed .ch.on { opacity: 1; }
 .caret { position: absolute; left: 0; top: 0; width: 4px; border-radius: 2px; background: linear-gradient(#5b4ae6, #6d2ae6); opacity: 0; pointer-events: none; will-change: transform; }
 .caret.show { opacity: 1; }
-.caret.blink { animation: caret-blink 1.05s steps(1, end) infinite; }
+.caret.blink { animation: caret-blink 1.05s steps(1, end) 2; }
+.caret.gone { opacity: 0; transition: opacity .45s ease; }
 @keyframes caret-blink { 0%, 55% { opacity: 1; } 56%, 100% { opacity: 0; } }
 .typed .accent { color: var(--purple); } /* solid fallback */
 @supports ((-webkit-background-clip: text) or (background-clip: text)) {
@@ -654,3 +655,10 @@ a.key-primary, a.key-primary:hover, a.key-primary:focus-visible, button.key-prim
 .unsub-page .form-card { margin: 32px 0 26px; }
 .unsub-note { color: var(--ink-3); font-size: .95rem; margin: 0 0 12px; }
 @media (max-width: 600px) { .unsub-page .form-card { padding: 30px 20px 24px; } }
+
+/* A6: typed headlines with a gradient accent paint the gradient on each letter (site.js sets each letter's size and
+   offset), so hidden letters stay hidden while typing and the finished line looks like one smooth gradient. */
+.typed.per-letter .accent { background: none; -webkit-text-fill-color: currentColor; color: var(--purple); }
+@supports ((-webkit-background-clip: text) or (background-clip: text)) {
+  .typed.per-letter .accent .ch { background-image: var(--accent-grad-soft); background-repeat: no-repeat; -webkit-background-clip: text; background-clip: text; -webkit-text-fill-color: transparent; color: transparent; }
+}

@@ -59,6 +59,21 @@
     caret.className = 'caret'; caret.setAttribute('aria-hidden', 'true');
     h.appendChild(caret);
 
+    // Gradient accents: a gradient painted on the accent span shows through even while its letters are hidden, so the
+    // gradient is painted on each letter instead, sized and offset so the letters together still form one gradient.
+    var accents = Array.prototype.slice.call(vis.querySelectorAll('.accent'));
+    if (accents.length) h.classList.add('per-letter');
+    function paintAccents() {
+      accents.forEach(function (a) {
+        var ar = a.getBoundingClientRect();
+        Array.prototype.forEach.call(a.querySelectorAll('.ch'), function (c) {
+          var r = c.getBoundingClientRect();
+          c.style.backgroundSize = ar.width.toFixed(1) + 'px 100%';
+          c.style.backgroundPosition = (ar.left - r.left).toFixed(1) + 'px 0';
+        });
+      });
+    }
+
     var pos = [], start = null, idx = 0, done = false;
     function measure() {
       var hr = h.getBoundingClientRect();
@@ -67,6 +82,7 @@
         return { l: r.left - hr.left, r: r.right - hr.left, t: r.top - hr.top, h: r.height };
       });
       start = pos[0];
+      paintAccents();
     }
     function place(i) {
       // caret sits after letter i-1 (or before the first letter when i is 0)
@@ -75,18 +91,23 @@
       caret.style.height = ch + 'px';
       caret.style.transform = 'translate3d(' + p.x.toFixed(1) + 'px,' + (p.t + (p.h - ch) / 2).toFixed(1) + 'px,0)';
     }
+    // Brisk: the whole line types in well under 2 s, then the caret blinks twice and fades away.
     function step() {
-      if (idx >= chars.length) { done = true; caret.classList.add('blink'); return; }
+      if (idx >= chars.length) {
+        done = true; caret.classList.add('blink');
+        setTimeout(function () { caret.classList.remove('blink'); caret.classList.add('gone'); }, 2100);
+        return;
+      }
       chars[idx].classList.add('on'); idx++; place(idx);
       var ch = chars[idx - 1].textContent;
-      var delay = 26 + Math.random() * 34;                      // uneven, like a real typist
-      if (/[.,;:!?]/.test(ch)) delay += 200;
-      if (idx < chars.length && chars[idx].parentNode !== chars[idx - 1].parentNode) delay += 30; // between words
+      var delay = 22 + Math.random() * 18;                      // uneven, like a real typist
+      if (idx < chars.length && /[.,;:!?]/.test(ch)) delay += 140;
+      if (idx < chars.length && chars[idx].parentNode !== chars[idx - 1].parentNode) delay += 20; // between words
       setTimeout(step, delay);
     }
     function begin() {
       measure(); place(0); caret.classList.add('show');
-      setTimeout(step, 320);
+      setTimeout(step, 180);
     }
     var resizeT;
     window.addEventListener('resize', function () {
