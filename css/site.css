@@ -672,3 +672,6 @@ a.key-primary, a.key-primary:hover, a.key-primary:focus-visible, button.key-prim
 @supports (overflow-x: clip) {
   html, body { overflow-x: clip; }
 }
+/* A6: contact page aside: question, Join the beta button, small note */
+.aside-card .aside-cta-q { margin: 0 0 12px; }
+.aside-card .aside-cta-note { margin: 10px 0 0; font-size: .88rem; color: var(--ink-3); }
