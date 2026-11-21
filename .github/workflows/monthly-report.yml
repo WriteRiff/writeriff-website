@@ -21,7 +21,7 @@ jobs:
           SITE_URL: https://writeriff.com/
           SITE_NAME: writeriff.com
           CF_ACCOUNT: 39b596138c7d5f14a1b23efde946d3ad
-          CF_SITE_TAG: ""
+          CF_SITE_TAG: 249926df27d549dab45a8e05e831bbfe
           CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
           PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
           PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
