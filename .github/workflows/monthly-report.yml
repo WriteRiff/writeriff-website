@@ -1,0 +1,30 @@
+name: Monthly report
+# Sends the owner a short report by Pushover on the 1st of each month, about 8 AM Central.
+# Runs on GitHub's computers; nobody has to start it. See .github/scripts/monthly_report.py.
+on:
+  schedule:
+    - cron: "0 14 1 * *"
+  workflow_dispatch:
+permissions:
+  contents: read
+  actions: write
+jobs:
+  report:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+      - name: Build and send the report
+        env:
+          SITE_URL: https://writeriff.com/
+          SITE_NAME: writeriff.com
+          CF_ACCOUNT: 39b596138c7d5f14a1b23efde946d3ad
+          CF_SITE_TAG: ""
+          CF_API_TOKEN: ${{ secrets.CF_API_TOKEN }}
+          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: python3 .github/scripts/monthly_report.py

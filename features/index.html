@@ -132,8 +132,18 @@
     </div>
     <div class="split-media" data-reveal data-reveal-delay="120">
       <figure class="photo">
-        <img src="../assets/img/book-phone-laptop.webp" width="720" height="1080" loading="lazy" alt="An open old book beside a smartphone and the corner of a laptop on a wooden desk">
-        <img class="sepia" src="../assets/img/book-phone-laptop.webp" width="720" height="1080" loading="lazy" alt="" aria-hidden="true">
+        <picture>
+          <source media="(width > 600px)" srcset="../assets/img/book-phone-laptop.webp">
+          <img src="../assets/img/book-phone-laptop.webp"
+               srcset="../assets/img/book-phone-laptop-phone-400w.webp 400w, ../assets/img/book-phone-laptop-phone-720w.webp 720w"
+               sizes="calc(100vw - 32px)" width="720" height="1080" loading="lazy" decoding="async" alt="An open old book beside a smartphone and the corner of a laptop on a wooden desk">
+        </picture>
+        <picture>
+          <source media="(width > 600px)" srcset="../assets/img/book-phone-laptop.webp">
+          <img class="sepia" src="../assets/img/book-phone-laptop.webp"
+               srcset="../assets/img/book-phone-laptop-phone-400w.webp 400w, ../assets/img/book-phone-laptop-phone-720w.webp 720w"
+               sizes="calc(100vw - 32px)" width="720" height="1080" loading="lazy" decoding="async" alt="" aria-hidden="true">
+        </picture>
       </figure>
     </div>
   </div>
@@ -241,8 +251,18 @@
     </div>
     <div class="split-media" data-reveal data-reveal-delay="120">
       <figure class="photo">
-        <img src="../assets/img/typewriter-white.webp" width="1000" height="656" loading="lazy" alt="An antique black typewriter with round keys on a white shelf">
-        <img class="sepia" src="../assets/img/typewriter-white.webp" width="1000" height="656" loading="lazy" alt="" aria-hidden="true">
+        <picture>
+          <source media="(width > 600px)" srcset="../assets/img/typewriter-white.webp">
+          <img src="../assets/img/typewriter-white.webp"
+               srcset="../assets/img/typewriter-white-phone-400w.webp 400w, ../assets/img/typewriter-white-phone-874w.webp 874w"
+               sizes="calc(100vw - 32px)" width="1000" height="656" loading="lazy" decoding="async" alt="An antique black typewriter with round keys on a white shelf">
+        </picture>
+        <picture>
+          <source media="(width > 600px)" srcset="../assets/img/typewriter-white.webp">
+          <img class="sepia" src="../assets/img/typewriter-white.webp"
+               srcset="../assets/img/typewriter-white-phone-400w.webp 400w, ../assets/img/typewriter-white-phone-874w.webp 874w"
+               sizes="calc(100vw - 32px)" width="1000" height="656" loading="lazy" decoding="async" alt="" aria-hidden="true">
+        </picture>
       </figure>
     </div>
   </div>

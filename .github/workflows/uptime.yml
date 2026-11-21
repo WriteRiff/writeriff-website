@@ -1,0 +1,35 @@
+name: Downtime alarm
+# Checks the site every 5 minutes on GitHub's computers (the PC can be off).
+# Alarm: Pushover emergency priority, repeating until acknowledged. See .github/scripts/uptime.py.
+on:
+  schedule:
+    - cron: "*/5 * * * *"
+  workflow_dispatch:
+    inputs:
+      test_alarm:
+        description: "Send a test alarm to the phone? (yes / no)"
+        default: "no"
+permissions:
+  contents: write
+concurrency:
+  group: uptime
+  cancel-in-progress: false
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+      - name: Check the site
+        env:
+          SITES: https://writeriff.com/,https://www.writeriff.com/
+          MUST_CONTAIN: WriteRiff
+          SITE_NAME: writeriff.com
+          PUSHOVER_USER: ${{ secrets.PUSHOVER_USER }}
+          PUSHOVER_TOKEN: ${{ secrets.PUSHOVER_TOKEN }}
+          TEST_ALARM: ${{ github.event.inputs.test_alarm }}
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+        run: python3 .github/scripts/uptime.py

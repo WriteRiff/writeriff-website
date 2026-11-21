@@ -107,8 +107,18 @@
     <div class="hero-visual">
       <div class="stamp" aria-hidden="true"><span>Now in<b>the works</b></span></div>
       <figure class="photo framed hero-photo" data-reveal>
-        <img src="assets/img/typewriter-desk.webp" width="1400" height="933" alt="A pale vintage typewriter on a warm wooden desk, seen from above" fetchpriority="high">
-        <img class="sepia" src="assets/img/typewriter-desk.webp" width="1400" height="933" alt="" aria-hidden="true">
+        <picture>
+          <source media="(width > 600px)" srcset="assets/img/typewriter-desk.webp">
+          <img src="assets/img/typewriter-desk.webp"
+               srcset="assets/img/typewriter-desk-720w.webp 720w, assets/img/typewriter-desk-1080w.webp 1080w, assets/img/typewriter-desk.webp 1400w"
+               sizes="calc((100vw - 32px) * 0.94 - 20px)" width="1400" height="933" alt="A pale vintage typewriter on a warm wooden desk, seen from above" fetchpriority="high">
+        </picture>
+        <picture>
+          <source media="(width > 600px)" srcset="assets/img/typewriter-desk.webp">
+          <img class="sepia" src="assets/img/typewriter-desk.webp"
+               srcset="assets/img/typewriter-desk-720w.webp 720w, assets/img/typewriter-desk-1080w.webp 1080w, assets/img/typewriter-desk.webp 1400w"
+               sizes="calc((100vw - 32px) * 0.94 - 20px)" width="1400" height="933" alt="" aria-hidden="true">
+        </picture>
       </figure>
       <div class="laptop" data-reveal data-reveal-delay="260" aria-hidden="true">
         <div class="laptop-lid">
@@ -151,12 +161,32 @@
   <div class="wrap split">
     <div class="split-media collage" data-reveal>
       <figure class="photo">
-        <img src="assets/img/old-books.webp" width="1000" height="666" loading="lazy" alt="A stack of old leather-bound books on a wooden table">
-        <img class="sepia" src="assets/img/old-books.webp" width="1000" height="666" loading="lazy" alt="" aria-hidden="true">
+        <picture>
+          <source media="(width > 600px)" srcset="assets/img/old-books.webp">
+          <img src="assets/img/old-books.webp"
+               srcset="assets/img/old-books-576w.webp 576w, assets/img/old-books-864w.webp 864w, assets/img/old-books.webp 1000w"
+               sizes="calc((100vw - 32px) * 0.72)" width="1000" height="666" loading="lazy" decoding="async" alt="A stack of old leather-bound books on a wooden table">
+        </picture>
+        <picture>
+          <source media="(width > 600px)" srcset="assets/img/old-books.webp">
+          <img class="sepia" src="assets/img/old-books.webp"
+               srcset="assets/img/old-books-576w.webp 576w, assets/img/old-books-864w.webp 864w, assets/img/old-books.webp 1000w"
+               sizes="calc((100vw - 32px) * 0.72)" width="1000" height="666" loading="lazy" decoding="async" alt="" aria-hidden="true">
+        </picture>
       </figure>
       <figure class="photo">
-        <img src="assets/img/book-phone-laptop.webp" width="720" height="1080" loading="lazy" alt="An open old book beside a smartphone and the corner of a laptop on a wooden desk">
-        <img class="sepia" src="assets/img/book-phone-laptop.webp" width="720" height="1080" loading="lazy" alt="" aria-hidden="true">
+        <picture>
+          <source media="(width > 600px)" srcset="assets/img/book-phone-laptop.webp">
+          <img src="assets/img/book-phone-laptop.webp"
+               srcset="assets/img/book-phone-laptop-352w.webp 352w, assets/img/book-phone-laptop-528w.webp 528w, assets/img/book-phone-laptop.webp 720w"
+               sizes="calc((100vw - 32px) * 0.46 - 10px)" width="720" height="1080" loading="lazy" decoding="async" alt="An open old book beside a smartphone and the corner of a laptop on a wooden desk">
+        </picture>
+        <picture>
+          <source media="(width > 600px)" srcset="assets/img/book-phone-laptop.webp">
+          <img class="sepia" src="assets/img/book-phone-laptop.webp"
+               srcset="assets/img/book-phone-laptop-352w.webp 352w, assets/img/book-phone-laptop-528w.webp 528w, assets/img/book-phone-laptop.webp 720w"
+               sizes="calc((100vw - 32px) * 0.46 - 10px)" width="720" height="1080" loading="lazy" decoding="async" alt="" aria-hidden="true">
+        </picture>
       </figure>
     </div>
     <div data-reveal data-reveal-delay="120">
@@ -258,8 +288,8 @@
     </div>
     <div class="split-media" data-reveal data-reveal-delay="120">
       <figure class="photo">
-        <img src="assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" alt="Close-up of a fountain pen nib touching cream paper">
-        <img class="sepia" src="assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" alt="" aria-hidden="true">
+        <img src="assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" decoding="async" alt="Close-up of a fountain pen nib touching cream paper">
+        <img class="sepia" src="assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" decoding="async" alt="" aria-hidden="true">
       </figure>
     </div>
   </div>
@@ -269,8 +299,8 @@
   <div class="wrap cta-grid">
     <div class="cta-photo" data-reveal>
       <figure class="photo">
-        <img src="assets/img/pen-letter.webp" width="1000" height="666" loading="lazy" alt="A fountain pen resting on a handwritten letter">
-        <img class="sepia" src="assets/img/pen-letter.webp" width="1000" height="666" loading="lazy" alt="" aria-hidden="true">
+        <img src="assets/img/pen-letter.webp" width="1000" height="666" loading="lazy" decoding="async" alt="A fountain pen resting on a handwritten letter">
+        <img class="sepia" src="assets/img/pen-letter.webp" width="1000" height="666" loading="lazy" decoding="async" alt="" aria-hidden="true">
       </figure>
       <p class="tag">“Dear writer, your seat at the desk is waiting.”</p>
     </div>

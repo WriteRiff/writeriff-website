@@ -76,3 +76,4 @@ Fonts: the opening prototype uses the visitor's own system font.
 | FFmpeg (via the `imageio-ffmpeg` Python package) | Retiming and compressing the intro video (prototype) | LGPL/GPL (tool only; nothing of it ships) | https://ffmpeg.org |
 | NumPy, Pillow | Video frames (prototype); resizing photos, making favicons and share images | BSD / MIT-CMU | https://numpy.org, https://python-pillow.org |
 | Playwright (Python) with Microsoft Edge | Headless checks and screenshots (`site/_tools/`) | Apache-2.0 | https://playwright.dev |
+| GitHub Actions `actions/checkout@v4` | Downtime alarm and monthly report workflows (nothing required) | MIT | https://github.com/actions/checkout/tree/v4 |

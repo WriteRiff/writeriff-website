@@ -218,6 +218,7 @@ main { display: block; }
 
 /* ---------- photos: start in sepia, bloom into colour when revealed ---------- */
 .photo { position: relative; margin: 0; border-radius: 6px; overflow: hidden; background: #d8c7a8; box-shadow: var(--shadow-2); }
+.photo picture { display: contents; }
 .photo img { width: 100%; height: 100%; object-fit: cover; }
 .photo .sepia { position: absolute; inset: 0; filter: sepia(.9) saturate(.75) contrast(.95) brightness(1.02); opacity: 1; transition: opacity 1.8s ease .35s; }
 .photo.framed { padding: 10px; background: #fffdf8; border-radius: 4px; }
@@ -509,6 +510,7 @@ main { display: block; }
   .hero-visual .laptop { left: 0; width: 64%; }
   .hero-visual .phone { right: 2%; width: 19%; }
   .hero-visual { padding-bottom: 120px; }
+  .hero-photo img { aspect-ratio: 1400 / 933; }
   .stamp { width: 84px; height: 84px; font-size: .58rem; top: -14px; left: 0; }
   .stamp b { font-size: .86rem; }
   .form-card { padding: 30px 20px 24px; }
@@ -580,7 +582,7 @@ body {
 body {
   background-color: #f8f2e6;
   background-image:
-    url(../assets/img/parchment-corner-50.webp),
+    var(--parchment-corner, url(../assets/img/parchment-corner-50.webp)),
     url(../assets/img/paper-fibre.webp),
     radial-gradient(ellipse 80% 1100px at 15% 0, rgba(255, 252, 245, .85), rgba(255, 252, 245, 0) 100%),
     linear-gradient(170deg, #fbf6ec 0%, #f8f1e4 35%, #f4eada 70%, #f0e3cc 100%);
@@ -589,7 +591,13 @@ body {
   background-repeat: no-repeat, repeat, no-repeat, no-repeat;
   background-blend-mode: normal, multiply, normal, normal;
 }
-@media (max-width: 700px) { body { background-size: 160% auto, 1000px 1000px, auto, auto; } }
+@media (max-width: 700px) {
+  body {
+    /* The rightmost 875 of 1400 pixels filled the viewport at 160% width. */
+    --parchment-corner: url(../assets/img/parchment-corner-50-phone-875w.webp);
+    background-size: 100% auto, 1000px 1000px, auto, auto;
+  }
+}
 
 /* Join the beta: built like "See the features" (a fine stroke on the face + a solid key base under it + a soft
    drop shadow), in the button's own purple. The base is a clearly deeper shade, so it reads as the key's shadow.

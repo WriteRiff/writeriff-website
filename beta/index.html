@@ -91,12 +91,22 @@
   <div class="wrap split">
     <div class="split-media collage" data-reveal>
       <figure class="photo">
-        <img src="../assets/img/old-books.webp" width="1000" height="666" loading="lazy" alt="A stack of old leather-bound books on a wooden table">
-        <img class="sepia" src="../assets/img/old-books.webp" width="1000" height="666" loading="lazy" alt="" aria-hidden="true">
+        <picture>
+          <source media="(width > 600px)" srcset="../assets/img/old-books.webp">
+          <img src="../assets/img/old-books.webp"
+               srcset="../assets/img/old-books-576w.webp 576w, ../assets/img/old-books-864w.webp 864w, ../assets/img/old-books.webp 1000w"
+               sizes="calc((100vw - 32px) * 0.72)" width="1000" height="666" loading="lazy" decoding="async" alt="A stack of old leather-bound books on a wooden table">
+        </picture>
+        <picture>
+          <source media="(width > 600px)" srcset="../assets/img/old-books.webp">
+          <img class="sepia" src="../assets/img/old-books.webp"
+               srcset="../assets/img/old-books-576w.webp 576w, ../assets/img/old-books-864w.webp 864w, ../assets/img/old-books.webp 1000w"
+               sizes="calc((100vw - 32px) * 0.72)" width="1000" height="666" loading="lazy" decoding="async" alt="" aria-hidden="true">
+        </picture>
       </figure>
       <figure class="photo">
-        <img src="../assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" alt="Close-up of a fountain pen nib touching cream paper">
-        <img class="sepia" src="../assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" alt="" aria-hidden="true">
+        <img src="../assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" decoding="async" alt="Close-up of a fountain pen nib touching cream paper">
+        <img class="sepia" src="../assets/img/fountain-pen.webp" width="800" height="1200" loading="lazy" decoding="async" alt="" aria-hidden="true">
       </figure>
     </div>
     <div data-reveal data-reveal-delay="120">
