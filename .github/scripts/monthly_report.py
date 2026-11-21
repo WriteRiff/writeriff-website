@@ -9,8 +9,8 @@ Google's own monthly Search Console email covers what people searched for on Goo
 Never asks visitors anything. Prints nothing private: the logs of a public repository are public.
 Secrets (entered by the owner in GitHub, never printed): PUSHOVER_USER, PUSHOVER_TOKEN, CF_API_TOKEN.
 """
-import base64, json, os, re, socket, ssl, urllib.error, urllib.parse, urllib.request
-from datetime import date, datetime, timedelta, timezone
+import base64, html, json, os, re, socket, ssl, urllib.error, urllib.parse, urllib.request
+from datetime import date, datetime, time, timedelta, timezone
 
 SITE = os.environ["SITE_URL"].rstrip("/") + "/"
 HOST = urllib.parse.urlparse(SITE).hostname
@@ -86,16 +86,16 @@ def visitors_section(prev_start, last_start, last_end):
     except Exception:
         site_tag = None
     if not site_tag:
-        return [f"<b>Visitors</b>: couldn't find {HOST} in Cloudflare Web Analytics."]
+        return [f"<b>Visitors</b>: couldn't find {html.escape(HOST)} in Cloudflare Web Analytics."]
     try:
         now_, before = cf(last_start, last_end, site_tag), cf(prev_start, last_start, site_tag)
     except Exception as e:
-        return [f"<b>Visitors</b>: couldn't read Cloudflare ({type(e).__name__})."]
+        return [f"<b>Visitors</b>: couldn't read Cloudflare ({html.escape(type(e).__name__)})."]
     t = now_["total"][0] if now_["total"] else {"count": 0, "sum": {"visits": 0}}
     b = before["total"][0] if before["total"] else {"count": 0, "sum": {"visits": 0}}
-    out = [f"<b>Visitors</b>: {t['sum']['visits']} visits, {t['count']} page views "
-           f"(month before: {b['sum']['visits']} visits)"]
-    pages = ", ".join(f"{p['dimensions']['requestPath']} {p['count']}" for p in now_["pages"])
+    out = [f"<b>Visitors</b>: {html.escape(str(t['sum']['visits']))} visits, "
+           f"{html.escape(str(t['count']))} page views (month before: {html.escape(str(b['sum']['visits']))} visits)"]
+    pages = ", ".join(html.escape(f"{p['dimensions']['requestPath']} {p['count']}") for p in now_["pages"])
     if pages:
         out.append(f"<b>Top pages</b>: {pages}")
     refs = []
@@ -103,26 +103,33 @@ def visitors_section(prev_start, last_start, last_end):
         h = r["dimensions"]["refererHost"] or "typed in / bookmark"
         if h == HOST or h.endswith("." + HOST):
             continue
-        refs.append(f"{h} {r['sum']['visits']}")
+        refs.append(html.escape(f"{h} {r['sum']['visits']}"))
     if refs:
         out.append(f"<b>How people found it</b>: {', '.join(refs[:5])}")
-    dev = ", ".join(f"{d['dimensions']['deviceType']} {d['sum']['visits']}" for d in now_["devices"])
+    dev = ", ".join(html.escape(f"{d['dimensions']['deviceType']} {d['sum']['visits']}") for d in now_["devices"])
     if dev:
         out.append(f"<b>Devices</b>: {dev}")
     return out
 
 
 def downtime_section(last_start, last_end):
+    month_start = datetime.combine(last_start, time.min, tzinfo=timezone.utc)
+    month_end = datetime.combine(last_end, time.min, tzinfo=timezone.utc)
     try:
         _, body = get(f"https://api.github.com/repos/{REPO}/contents/state.json?ref=uptime-state",
                       {"Authorization": f"Bearer {GH}", "Accept": "application/vnd.github+json"})
         state = json.loads(base64.b64decode(json.loads(body)["content"]))
+        intervals = [(datetime.fromisoformat(i["start"]), datetime.fromisoformat(i["end"]))
+                     for i in state.get("incidents", [])]
+        if state.get("down") and state.get("since"):
+            intervals.append((datetime.fromisoformat(state["since"]), datetime.now(timezone.utc)))
+        overlaps = [min(end, month_end) - max(start, month_start) for start, end in intervals]
     except Exception:
-        return "<b>Downtime</b>: none recorded."
-    inc = [i for i in state.get("incidents", []) if last_start.isoformat() <= i["start"][:10] < last_end.isoformat()]
-    if not inc:
+        return "<b>Downtime</b>: couldn't read the record."
+    seconds = [overlap.total_seconds() for overlap in overlaps if overlap > timedelta(0)]
+    if not seconds:
         return "<b>Downtime</b>: none." + (" (Down right now!)" if state.get("down") else "")
-    return f"<b>Downtime</b>: {len(inc)} time(s), {sum(i['minutes'] for i in inc)} minutes in all."
+    return f"<b>Downtime</b>: {len(seconds)} time(s), {round(sum(seconds) / 60)} minutes in all."
 
 
 def broken_links():
@@ -134,11 +141,11 @@ def broken_links():
     seen, bad = set(), []
     for p in pages:
         try:
-            _, html = get(p)
+            _, page_html = get(p)
         except Exception:
             bad.append(urllib.parse.urlparse(p).path)
             continue
-        for link in re.findall(r'(?:href|src)="([^"#]+)', html.decode("utf-8", "replace")):
+        for link in re.findall(r'(?:href|src)="([^"#]+)', page_html.decode("utf-8", "replace")):
             u = urllib.parse.urljoin(p, link)
             if urllib.parse.urlparse(u).hostname != HOST or u in seen:
                 continue
@@ -151,7 +158,7 @@ def broken_links():
                 bad.append(urllib.parse.urlparse(u).path)
     if not bad:
         return f"<b>Broken links</b>: none ({len(seen)} checked)."
-    return f"<b>Broken links</b>: {len(bad)}: " + ", ".join(bad[:5])
+    return f"<b>Broken links</b>: {len(bad)}: " + html.escape(", ".join(bad[:5]))
 
 
 def cert_date():
@@ -159,9 +166,9 @@ def cert_date():
         ctx = ssl.create_default_context()
         with socket.create_connection((HOST, 443), timeout=15) as s, ctx.wrap_socket(s, server_hostname=HOST) as t:
             end = datetime.strptime(t.getpeercert()["notAfter"], "%b %d %H:%M:%S %Y %Z").date()
-        return f"<b>Security certificate</b>: OK until {end:%b %d, %Y} (GitHub renews it automatically)."
+        return f"<b>Security certificate</b>: OK until {html.escape(end.strftime('%b %d, %Y'))} (GitHub renews it automatically)."
     except Exception as e:
-        return f"<b>Security certificate</b>: PROBLEM ({type(e).__name__}). Check the site."
+        return f"<b>Security certificate</b>: PROBLEM ({html.escape(type(e).__name__)}). Check the site."
 
 
 def domain_date():
@@ -171,7 +178,7 @@ def domain_date():
         end = date.fromisoformat(ev["expiration"])
         days = (end - date.today()).days
         warn = " RENEW SOON: check GoDaddy auto-renew." if days < 45 else ""
-        return f"<b>Domain</b>: registered until {end:%b %d, %Y} ({days} days).{warn}"
+        return f"<b>Domain</b>: registered until {html.escape(end.strftime('%b %d, %Y'))} ({days} days).{warn}"
     except Exception:
         return "<b>Domain</b>: couldn't look up the renewal date."
 

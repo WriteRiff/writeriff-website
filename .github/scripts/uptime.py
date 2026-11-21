@@ -113,6 +113,7 @@ def main():
         r = pushover(f"TEST: {NAME} is down", "This is a test of the downtime alarm. Acknowledge it in Pushover to stop it repeating.", 2, SITES[0])
         print("Test alarm sent. Waiting 60 seconds before the test 'back up' message.")
         time.sleep(60)
+        cancel(r)
         pushover(f"TEST: {NAME} is back up", "Test finished. Real alarms work the same way.", 0, SITES[0])
         return
 

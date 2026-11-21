@@ -159,7 +159,8 @@ em.serif, .serif-i { font-family: var(--serif); font-style: italic; font-weight:
   .site-nav a:not(.key) { padding: 14px 4px; border-bottom: 1px solid var(--line); font-size: 1.05rem; }
   .site-nav a:not(.key)::after { display: none; }
   .site-nav .key { margin-top: 16px; }
-  .no-js .site-nav { position: static; opacity: 1; visibility: visible; transform: none; }
+  html:not(.js) .site-nav { position: static; opacity: 1; visibility: visible; transform: none; }
+  html:not(.js) .nav-toggle { display: none; }
 }
 
 /* ---------- sections ---------- */

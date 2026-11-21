@@ -13,18 +13,18 @@
  *   The form gets class "is-sending", then "is-done" (success) or "is-error". Fields failing checks get aria-invalid="true".
  *
  * Saves to Supabase (tables beta_signups / contact_messages / email_unsubscribes, insert-only for visitors; SQL in /supabase).
- * While those tables don't exist yet, or the network fails, visitors see a friendly message instead of an error.
+ * If the endpoint is unavailable or the network fails, visitors see a friendly message.
  */
 (function () {
   'use strict';
   var cfg = window.WR_CONFIG || {};
-  var LOADED = Date.now();
   var EMAIL_RE = /^[^\s@]{1,64}@[^\s@]{1,190}\.[^\s@]{2,}$/;
   var MSG = {
     beta: { ok: "You're on the list! We'll email you when the WriteRiff beta opens.",
             // Same words as "ok" on purpose, so the form never reveals whether an address is already on the list.
             dup: "You're on the list! We'll email you when the WriteRiff beta opens." },
-    contact: { ok: "Thanks! Your message reached the WriteRiff team. We'll reply by email." },
+    contact: { ok: "Thanks! Your message reached the WriteRiff team. We'll reply by email.",
+               soon: "Our contact form isn't quite ready yet. Please email us at " },
     unsubscribe: { ok: "Done. This address is now off all WriteRiff news emails, starting right away.",
                    soon: "We can't record that online just yet. Please email us at " },
     soon: "Thanks for your interest! Our sign-up desk opens in just a few days, so please try again soon, or email us at ",
@@ -55,6 +55,7 @@
 
   function check(form, kind) {
     var errors = [];
+    var badUp = false;
     var email = val(form, 'email');
     var badEmail = !EMAIL_RE.test(email) || email.length > 254;
     invalid(form, 'email', badEmail); if (badEmail) errors.push('a valid email address');
@@ -63,14 +64,20 @@
     invalid(form, 'name', badName); if (badName) errors.push(kind === 'contact' ? 'your name' : 'a shorter name');
     if (kind === 'beta') {
       var up = form.elements.updates;
-      var badUp = up && !up.checked;
-      invalid(form, 'updates', badUp); if (badUp) errors.push('a tick in the box (it\'s how you join the beta list)');
+      badUp = up && !up.checked;
+      invalid(form, 'updates', badUp);
     } else if (kind === 'contact') {
       var m = val(form, 'message');
       var badMsg = m.length < 2 || m.length > 5000;
       invalid(form, 'message', badMsg); if (badMsg) errors.push(m.length > 5000 ? 'a shorter message (5,000 characters at most)' : 'a message');
     }
-    return errors;
+    var message = '';
+    if (errors.length) {
+      var list = errors.length > 1 ? errors.slice(0, -1).join(', ') + ' and ' + errors[errors.length - 1] : errors[0];
+      message = 'Please add ' + list + '.';
+    }
+    if (badUp) message += (message ? ' ' : '') + 'Please check the box to join the beta list.';
+    return message;
   }
 
     function row(form, kind) {
@@ -98,8 +105,8 @@
     }).then(function (r) {
       clearTimeout(timer);
       if (r.ok) return 'ok';
-      if (r.status === 409) return 'dup';                      // older table versions: already listed (now answered with 201)
-      if (r.status === 404) return 'soon';                   // tables not created yet
+      if (r.status === 409 && (kind === 'beta' || kind === 'unsubscribe')) return 'dup'; // request already recorded
+      if (r.status === 404) return 'soon';                     // endpoint unavailable
       return 'offline';                                      // 400 = hourly/daily limits or checks failed, or server trouble: "try again later"
     }, function () { clearTimeout(timer); return 'offline'; });
   }
@@ -111,22 +118,18 @@
       e.preventDefault();
       if (form.classList.contains('is-sending')) return;
       form.classList.remove('is-error', 'is-done');
-      var errors = check(form, kind);
-      if (errors.length) {
+      var error = check(form, kind);
+      if (error) {
         form.classList.add('is-error');
-        var list = errors.length > 1 ? errors.slice(0, -1).join(', ') + ' and ' + errors[errors.length - 1] : errors[0];
-        setStatus(form, 'Please add ' + list + '.');
+        setStatus(form, error);
         var first = form.querySelector('[aria-invalid="true"]'); if (first) first.focus();
         return;
       }
-      // Spam guards: the hidden "company" field is sent with the row and the database silently drops rows that fill it;
-      // a submit within 2.5 s of loading the page is treated as a bot here and gets a fake "thanks" without sending.
-      var bot = Date.now() - LOADED < 2500;
+      // The server drops rows with a filled "company" honeypot and rate-limits each sender.
       var btn = form.querySelector('[type="submit"]');
       form.classList.add('is-sending'); if (btn) btn.disabled = true;
       setStatus(form, 'Sending…');
-      var p = bot ? new Promise(function (r) { setTimeout(function () { r('ok'); }, 600); }) : send(kind, row(form, kind));
-      p.then(function (result) {
+      send(kind, row(form, kind)).then(function (result) {
         form.classList.remove('is-sending'); if (btn) btn.disabled = false;
         if (result === 'ok' || result === 'dup') {
           form.classList.add('is-done');

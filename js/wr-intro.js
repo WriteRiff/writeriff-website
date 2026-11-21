@@ -114,7 +114,7 @@
     logoBox = document.createElement('div'); logoBox.className = 'wr-intro-logo';
     intro.appendChild(introBg); intro.appendChild(logoBox);
     skipBtn = document.createElement('button'); skipBtn.type = 'button'; skipBtn.className = 'wr-skip'; skipBtn.textContent = 'Skip intro';
-    document.body.appendChild(intro); document.body.appendChild(skipBtn);
+    document.body.appendChild(intro); document.body.insertBefore(skipBtn, document.body.firstChild);
   }
   function layoutIntro() {
     var vw = window.innerWidth, vh = window.innerHeight;
