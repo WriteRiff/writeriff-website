@@ -1,8 +1,9 @@
 <!doctype html>
 <!-- WriteRiff account page (T1, #33, 2026-11-19; review fixes the same day). Every account email button opens this page:
      https://writeriff.com/account-callback#token_hash=...&type=signup|recovery|invite|email_change|magiclink
-     The one-time token_hash sits after "#", so it never reaches any web server, and opening the link uses up nothing (mail
-     scanners that follow links can't spend it). The writer presses a button; only then does the page ask Supabase to check the
+     The page accepts sign-in parameters only after "#", where they never reach a web server, and refuses them in the query
+     string because they could appear in server logs and browser history. Opening the link uses up nothing (mail scanners
+     that follow links can't spend it). The writer presses a button; only then does the page ask Supabase to check the
      link (POST /auth/v1/verify). Password reset and invitations then show a "choose a password" form on this page. Magic links
      are never checked here: the button hands the unused token to the WriteRiff app, which checks it and signs in there.
      The page wipes the link from the address bar first, never writes link text into the page, keeps any sign-in only in memory
@@ -14,7 +15,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'sha256-pEJ46QJmdz7OHu0mBwWEONT5yNl0DVxphxx2xK8ariA='; connect-src https://rnehrjdaruejuueztngc.supabase.co; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; img-src 'self' data:; style-src 'unsafe-inline'; script-src 'sha256-/hrHFs7Ndo4KpZGERvjwKF3M04EWTVHQny55IR6BaTM='; connect-src https://rnehrjdaruejuueztngc.supabase.co; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="robots" content="noindex">
 <meta name="color-scheme" content="light dark">
@@ -66,7 +67,7 @@
     <section data-state="none">
       <h1>WriteRiff accounts</h1>
       <p>This page opens when you use a button in a WriteRiff account email. Came from an email and this is all you see? Open the link in your phone's or computer's usual web browser.</p>
-      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+      <a class="button" href="writeriff://workspace">Open WriteRiff</a>
     </section>
 
     <section data-state="confirm_signup" hidden>
@@ -124,7 +125,7 @@
       <div class="check" aria-hidden="true">&#10003;</div>
       <h1>Password saved</h1>
       <p>Go back to WriteRiff and sign in with your email address and your new password.</p>
-      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+      <a class="button" href="writeriff://workspace">Open WriteRiff</a>
       <p class="small">Button doesn't open the app? Just open WriteRiff from your home screen or apps list.</p>
     </section>
 
@@ -132,7 +133,7 @@
       <div class="check" aria-hidden="true">&#10003;</div>
       <h1>You're confirmed!</h1>
       <p>Your WriteRiff account is ready. Go back to WriteRiff and sign in with your email address and password.</p>
-      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+      <a class="button" href="writeriff://workspace">Open WriteRiff</a>
       <p class="small">Button doesn't open the app? Just open WriteRiff from your home screen or apps list.</p>
     </section>
 
@@ -140,7 +141,7 @@
       <div class="check" aria-hidden="true">&#10003;</div>
       <h1>Email address confirmed</h1>
       <p>Your new email address is confirmed. Use it the next time you sign in to WriteRiff.</p>
-      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+      <a class="button" href="writeriff://workspace">Open WriteRiff</a>
     </section>
 
     <section data-state="email_change_pending" hidden>
@@ -151,7 +152,7 @@
     <section data-state="magiclink" hidden>
       <h1>Sign in to WriteRiff</h1>
       <p>Press the button on the phone or tablet where WriteRiff is installed. The app checks the link and signs you in.</p>
-      <a class="button" id="open-app" href="writers-flow://workspace">Open WriteRiff to sign in</a>
+      <a class="button" id="open-app" href="writeriff://workspace">Open WriteRiff to sign in</a>
       <p class="small">On a computer? Sign in with your email address and password instead, or open this email on your phone.</p>
     </section>
 
@@ -170,7 +171,13 @@
       <h1>This link has expired</h1>
       <p>Email links work once and expire after 1 hour. If you already used this one, you're all set.</p>
       <p>Otherwise, open WriteRiff and ask for a new email from the sign-in screen or <strong>App Settings &rarr; Account</strong>.</p>
-      <a class="button" href="writers-flow://workspace">Open WriteRiff</a>
+      <a class="button" href="writeriff://workspace">Open WriteRiff</a>
+    </section>
+
+    <section data-state="link_refused" hidden>
+      <h1>This link didn't work</h1>
+      <p>For your security, this link can't be used. Open WriteRiff and ask for a new email from the sign-in screen or <strong>App Settings &rarr; Account</strong>, then use the button in that new email.</p>
+      <a class="button" href="writeriff://workspace">Open WriteRiff</a>
     </section>
   </div>
   <p class="foot">Questions? <a href="mailto:support@writeriff.com">support@writeriff.com</a> &middot; <a href="/">Back to WriteRiff</a></p>
@@ -178,19 +185,35 @@
 <script>
 (function () {
   "use strict";
-  var raw = (location.hash || "").slice(1) + "&" + (location.search || "").slice(1);
+  var raw = (location.hash || "").slice(1);
+  var query = (location.search || "").slice(1);
   // Wipe the secret part of the link from the address bar and history before anything else.
   if (location.hash || location.search) { try { history.replaceState(null, "", location.pathname); } catch (e) {} }
   var has = function (o, k) { return Object.prototype.hasOwnProperty.call(o, k); };
+  var decode = function (s) { return decodeURIComponent(s.replace(/\+/g, " ")); };
   var p = Object.create(null);
   raw.split("&").forEach(function (pair) {
     if (!pair) return;
     var i = pair.indexOf("=");
     var key = i < 0 ? pair : pair.slice(0, i);
     var value = i < 0 ? "" : pair.slice(i + 1);
-    try { key = decodeURIComponent(key.replace(/\+/g, " ")); value = decodeURIComponent(value.replace(/\+/g, " ")); } catch (e) { return; }
+    try { key = decode(key); value = decode(value); } catch (e) { return; }
     if (!(key in p)) p[key] = value;
   });
+  var refused = query.split("&").some(function (pair) {
+    if (!pair) return false;
+    var i = pair.indexOf("=");
+    var key;
+    try { key = decode(i < 0 ? pair : pair.slice(0, i)); } catch (e) { return true; }
+    if (/^(token_hash|token|access_token|refresh_token|provider_token|provider_refresh_token|code|type)$/.test(key)) return true;
+    // Preserve query error handling, including precedence for a matching fragment key.
+    if (/^(error|error_code|error_description)$/.test(key) && !(key in p)) {
+      try { p[key] = i < 0 ? "" : decode(pair.slice(i + 1)); } catch (e) {}
+    }
+    return false;
+  });
+  if (refused) { show("link_refused"); return; }
+
   // Link word -> Supabase verify type. Magic links are not verified here (the app does it).
   var VERIFY = { signup: "email", email_change: "email_change", recovery: "recovery", invite: "invite" };
   var TOKEN = /^[A-Za-z0-9_-]{20,512}$/;
@@ -265,7 +288,7 @@
   else if (type === "magiclink") state = TOKEN.test(token) ? "magiclink" : "expired";
   else if (has(VERIFY, type)) state = !TOKEN.test(token) ? "expired" : configured ? "confirm_" + type : "unavailable";
   if (state === "magiclink") {
-    document.getElementById("open-app").setAttribute("href", "writers-flow://account-callback?type=magiclink&token_hash=" + encodeURIComponent(token));
+    document.getElementById("open-app").setAttribute("href", "writeriff://account-callback?type=magiclink&token_hash=" + encodeURIComponent(token));
   }
 
   var go = document.querySelectorAll("[data-go]");
