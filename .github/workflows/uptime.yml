@@ -1,9 +1,10 @@
 name: Downtime alarm
-# Checks the site every 5 minutes on GitHub's computers (the PC can be off).
+# SCHEDULE TURNED OFF 2026-11-26: GitHub only ran this every 6-10 hours, so it could not be trusted. The real downtime alarm is now
+# a Cloudflare Worker that checks every minute. This file stays for manual test runs only.
 # Alarm: Pushover emergency priority, repeating until acknowledged. See .github/scripts/uptime.py.
 on:
-  schedule:
-    - cron: "*/5 * * * *"
+  # schedule (turned off, see note above):
+  #   - cron: "*/5 * * * *"
   workflow_dispatch:
     inputs:
       test_alarm:
